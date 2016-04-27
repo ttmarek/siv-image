@@ -120,6 +120,14 @@ const Layer = {
     return this.props.extState.offset[currentImg] || { dx: 0, dy: 0 }
   },
 
+  getCurrentRotation () {
+    // Return's the current image's rotation angle (in radians). If
+    // the current image hasn't been rotated then the function returns
+    // 0
+    const currentImg = this.props.sivState.currentImg
+    return this.props.extState.rotation[currentImg] || 0
+  },
+
   scaleToFit (img, viewerWidth, viewerHeight) {
     // Returns a number that can be multiplied to the image width and
     // height to make the image fit within the viewer
@@ -134,14 +142,28 @@ const Layer = {
   handleMouseMove (event) {
     if (this.imgDrawn === 'error') return
     if (this.mouseDown) {
-      const currentOffset = this.getCurrentOffset()
+      const offset = (() => {
+        const currentOffset = this.getCurrentOffset()
+        const rotation = this.getCurrentRotation()
+        const movementX = event.nativeEvent.movementX
+        const movementY = event.nativeEvent.movementY
+        if (rotation != 0) {
+          const sinTheta = Math.sin(rotation)
+          const cosTheta = Math.cos(rotation)
+          return {
+            dx: currentOffset.dx + (cosTheta * movementX) + (sinTheta * movementY),
+            dy: currentOffset.dy + (cosTheta * movementY) - (sinTheta * movementX)
+          }
+        }
+        return {
+          dx: currentOffset.dx + movementX,
+          dy: currentOffset.dy + movementY
+        }
+      })()
       this.props.extDispatch({
         type: 'UPDATE_IMAGE',
         imagePath: this.props.sivState.currentImg,
-        offset: {
-          dx: currentOffset.dx + event.nativeEvent.movementX,
-          dy: currentOffset.dy + event.nativeEvent.movementY
-        }
+        offset
       })
     }
   },
@@ -150,8 +172,14 @@ const Layer = {
     if (this.imgDrawn === 'error') return
     // The incremented/decremented scale
     const nextScale = (() => {
-      const maxScale = 3
-      const minScale = 1
+      const maxScale = 4
+      const minScale = (() => {
+        const rotation = this.getCurrentRotation()
+        if (rotation != 0) {
+          return 0.25
+        }
+        return 1
+      })()
       const scaleIncr = 0.25
       const currentScale = this.getCurrentScale()
       if (mouseEvent.deltaY < 0) {
@@ -228,7 +256,15 @@ const Layer = {
           }
           const canvas = this.refs.canvas
           const ctx = canvas.getContext('2d')
+          ctx.setTransform(1, 0, 0, 1, 0, 0)
           ctx.clearRect(0, 0, canvas.width, canvas.height)
+          // Rotate the canvas about the image center if necessary
+          const rotation = this.getCurrentRotation()
+          if (rotation != 0) {
+            ctx.translate(canvas.width * 0.5, canvas.height * 0.5)
+            ctx.rotate(rotation)
+            ctx.translate(canvas.width * -0.5, canvas.height * -0.5)
+          }
           ctx.drawImage(img, position.dx, position.dy, scaledImgWidth, scaledImgHeight)
           // The dimensions of the drawn image are needed in the
           // handleScroll and handleMouseMove functions

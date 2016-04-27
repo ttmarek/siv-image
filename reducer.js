@@ -4,6 +4,7 @@ const initialState = {
   // the images property
   version: 0,
   scale: {},
+  rotation: {},
   offset: {}
 }
 
@@ -23,6 +24,12 @@ const reducer = (x, action) => {
         const newOffset = {}
         newOffset[action.imagePath] = action.offset
         updates.offset = update(previousState.offset, { $merge: newOffset })
+      }
+      if (action.rotation || action.rotation === 0) {
+        // Rotation can be zero. Keep in mind that 0 == false in JS
+        const newRotation = {}
+        newRotation[action.imagePath] = action.rotation
+        updates.rotation = update(previousState.rotation, { $merge: newRotation })
       }
       return update(previousState, { $merge: updates })
     default:
