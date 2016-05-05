@@ -14,7 +14,8 @@ const Controls = {
   },
 
   statics: {
-    extId: extId
+    extId: extId,
+    extName: 'Image'
   },
 
   sliderRadius: 50,
@@ -47,56 +48,41 @@ const Controls = {
   },
 
   render () {
-    const titleColor = (() => {
-      if (this.props.isActive) {
-        return { color: 'rgb(51, 122, 183)' }
-      }
-      return {}
-    })()
-    const close = () => {
-      this.props.sivDispatch({
-        type: 'CLOSE_EXTENSION',
-        extId: extId
-      })
-    }
     return (
-      h('div.ext-container', [
-        h('div.ext-title', [
-          h('span', { style: titleColor }, 'Image'),
-          h('img', { src: 'icons/ic_close_white_18px.svg', onClick: close })
-        ]),
-        h('canvas', {
-          ref: 'radialSlider',
-          style: styles.radialSlider,
-          width: '175px',
-          height: '150px',
-          onMouseMove: this.handleMouseMove,
-          onMouseDown: this.handleMouseDown,
-          onMouseUp: this.handleMouseUp
-        }),
-        h('div', { style: styles.radialSliderBtnsWrapper }, [
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(0)
-          }, '0\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI * 0.5)
-          }, '90\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI)
-          }, '180\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI * 1.5)
-          }, '270\u00B0')
+      h('div',
+        [
+          h('canvas', {
+            ref: 'radialSlider',
+            style: styles.radialSlider,
+            width: '175px',
+            height: '150px',
+            onMouseMove: this.handleMouseMove,
+            onMouseDown: this.handleMouseDown,
+            onMouseUp: this.handleMouseUp
+          }),
+          h('div', { style: styles.radialSliderBtnsWrapper }, [
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(0)
+            }, '0\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI * 0.5)
+            }, '90\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI)
+            }, '180\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI * 1.5)
+            }, '270\u00B0')
+          ])
         ])
-      ])
     )
   },
 
