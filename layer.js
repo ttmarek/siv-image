@@ -182,7 +182,7 @@ const Layer = {
       })()
       const scaleIncr = 0.25
       const currentScale = this.getCurrentScale()
-      if (mouseEvent.deltaY < 0) {
+      if (mouseEvent.deltaY < 0) { // scroll up
         return currentScale + Math.min(scaleIncr, (maxScale - currentScale))
       }
       return currentScale + Math.max(-scaleIncr, (minScale - currentScale))

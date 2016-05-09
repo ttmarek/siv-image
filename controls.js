@@ -2,6 +2,7 @@
 const React = require('react')
 const h = require('react-hyperscript')
 const styles = require('./styles')
+const slider = require('./slider')
 const extId = "WdMG"
 
 const Controls = {
@@ -56,6 +57,7 @@ const Controls = {
             style: styles.radialSlider,
             width: '175px',
             height: '150px',
+            onWheel: this.handleScroll,
             onMouseMove: this.handleMouseMove,
             onMouseDown: this.handleMouseDown,
             onMouseUp: this.handleMouseUp
@@ -84,6 +86,19 @@ const Controls = {
           ])
         ])
     )
+  },
+
+  handleScroll (mouseEvent) {
+    const currentImg = this.props.sivState.currentImg
+    const currentAngle = this.props.extState.rotation[currentImg] || 0
+    const direction = (() => {
+      if (mouseEvent.deltaY < 0) {
+        return 'up'
+      }
+      return 'down'
+    })()
+    const newAngle = slider.incrAngleByOneDegree(currentAngle, direction)
+    this.setAngle(newAngle)
   },
 
   handleMouseDown (mouseEvent) {
@@ -124,7 +139,7 @@ const Controls = {
     }
   },
 
-  setAngle (angle) {
+  setAngle (angle) {            // angles should be in rad
     this.props.extDispatch({
       type: 'UPDATE_IMAGE',
       imagePath: this.props.sivState.currentImg,
