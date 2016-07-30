@@ -1,11 +1,9 @@
 'use strict'
-const React = require('react')
-const h = require('react-hyperscript')
 const styles = require('./styles')
 const slider = require('./slider')
 const extId = "WdMG"
 
-const Controls = {
+const Controls = (React, h) => React.createClass({
   propTypes: {
     sivState: React.PropTypes.object.isRequired,
     sivDispatch: React.PropTypes.func.isRequired,
@@ -215,6 +213,6 @@ const Controls = {
     const degrees = Math.round(slider.angle * 180 / Math.PI)
     ctx.fillText(`${degrees}\u00B0`, canvasCenter.x + 3, canvasCenter.y)
   }
-}
+})
 
-module.exports = React.createClass(Controls)
+module.exports = Controls

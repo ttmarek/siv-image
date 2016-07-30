@@ -2,14 +2,12 @@
 const remote = require('electron').remote
 const clipboard = require('electron').clipboard
 const nativeImage = require('electron').nativeImage
-const React = require('react')
-const h = require('react-hyperscript')
 const loadImage = require('./load-image')
 
 const extId = 'WdMG'
 const layerName = 'image'
 
-const Layer = {
+const Layer = (React, h) => React.createClass({
   propTypes: {
     zIndex: React.PropTypes.number,
     sivState: React.PropTypes.object.isRequired,
@@ -290,6 +288,6 @@ const Layer = {
         })
     }
   }
-}
+})
 
-module.exports = React.createClass(Layer)
+module.exports = Layer

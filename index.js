@@ -4,9 +4,9 @@ const reducer = require('./reducer')
 const Layer = require('./layer')
 const Controls = require('./controls')
 
-module.exports = {
-  extId: extId,
-  Controls,
-  Layer,
-  reducer
-}
+module.exports = (React, h) => ({
+  extId,
+  reducer,
+  Controls: Controls(React, h),
+  Layer: Layer(React, h),
+});
