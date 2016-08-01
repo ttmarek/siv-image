@@ -1,10 +1,13 @@
 'use strict'
+
 const React = require('react')
 const h = require('react-hyperscript')
 const styles = require('./styles')
+const slider = require('./slider')
+
 const extId = "WdMG"
 
-const Controls = {
+const Controls = (React, h) => React.createClass({
   propTypes: {
     sivState: React.PropTypes.object.isRequired,
     sivDispatch: React.PropTypes.func.isRequired,
@@ -14,7 +17,8 @@ const Controls = {
   },
 
   statics: {
-    extId: extId
+    extId: extId,
+    extName: 'Image'
   },
 
   sliderRadius: 50,
@@ -47,57 +51,56 @@ const Controls = {
   },
 
   render () {
-    const titleColor = (() => {
-      if (this.props.isActive) {
-        return { color: 'rgb(51, 122, 183)' }
-      }
-      return {}
-    })()
-    const close = () => {
-      this.props.sivDispatch({
-        type: 'CLOSE_EXTENSION',
-        extId: extId
-      })
-    }
     return (
-      h('div.ext-container', [
-        h('div.ext-title', [
-          h('span', { style: titleColor }, 'Image'),
-          h('img', { src: 'icons/ic_close_white_18px.svg', onClick: close })
-        ]),
-        h('canvas', {
-          ref: 'radialSlider',
-          style: styles.radialSlider,
-          width: '175px',
-          height: '150px',
-          onMouseMove: this.handleMouseMove,
-          onMouseDown: this.handleMouseDown,
-          onMouseUp: this.handleMouseUp
-        }),
-        h('div', { style: styles.radialSliderBtnsWrapper }, [
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(0)
-          }, '0\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI * 0.5)
-          }, '90\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI)
-          }, '180\u00B0'),
-          h('button', {
-            className: 'btn btn-default',
-            style: styles.radialSliderBtn,
-            onClick: () => this.setAngle(Math.PI * 1.5)
-          }, '270\u00B0')
+      h('div',
+        [
+          h('canvas', {
+            ref: 'radialSlider',
+            style: styles.radialSlider,
+            width: '175px',
+            height: '150px',
+            onWheel: this.handleScroll,
+            onMouseMove: this.handleMouseMove,
+            onMouseDown: this.handleMouseDown,
+            onMouseUp: this.handleMouseUp
+          }),
+          h('div', { style: styles.radialSliderBtnsWrapper }, [
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(0)
+            }, '0\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI * 0.5)
+            }, '90\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI)
+            }, '180\u00B0'),
+            h('button', {
+              className: 'btn btn-default',
+              style: styles.radialSliderBtn,
+              onClick: () => this.setAngle(Math.PI * 1.5)
+            }, '270\u00B0')
+          ])
         ])
-      ])
     )
+  },
+
+  handleScroll (mouseEvent) {
+    const currentImg = this.props.sivState.currentImg
+    const currentAngle = this.props.extState.rotation[currentImg] || 0
+    const direction = (() => {
+      if (mouseEvent.deltaY < 0) {
+        return 'up'
+      }
+      return 'down'
+    })()
+    const newAngle = slider.incrAngleByOneDegree(currentAngle, direction)
+    this.setAngle(newAngle)
   },
 
   handleMouseDown (mouseEvent) {
@@ -138,7 +141,7 @@ const Controls = {
     }
   },
 
-  setAngle (angle) {
+  setAngle (angle) {            // angles should be in rad
     this.props.extDispatch({
       type: 'UPDATE_IMAGE',
       imagePath: this.props.sivState.currentImg,
@@ -214,6 +217,6 @@ const Controls = {
     const degrees = Math.round(slider.angle * 180 / Math.PI)
     ctx.fillText(`${degrees}\u00B0`, canvasCenter.x + 3, canvasCenter.y)
   }
-}
+})
 
-module.exports = React.createClass(Controls)
+module.exports = Controls
